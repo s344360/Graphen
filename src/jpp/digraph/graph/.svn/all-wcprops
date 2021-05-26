@@ -1,0 +1,53 @@
+K 25
+svn:wc:ra_dav:version-url
+V 84
+/repos/ss13_pp_inf_herbst/!svn/ver/14110/users/s226285/graphen/src/jpp/digraph/graph
+END
+IDiGraph.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/IDiGraph.java
+END
+IXYNode.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/IXYNode.java
+END
+INode.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/INode.java
+END
+CostEdge.java
+K 25
+svn:wc:ra_dav:version-url
+V 98
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/CostEdge.java
+END
+DiGraph.java
+K 25
+svn:wc:ra_dav:version-url
+V 97
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/DiGraph.java
+END
+IEdge.java
+K 25
+svn:wc:ra_dav:version-url
+V 95
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/IEdge.java
+END
+ICostEdge.java
+K 25
+svn:wc:ra_dav:version-url
+V 99
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/ICostEdge.java
+END
+XYNode.java
+K 25
+svn:wc:ra_dav:version-url
+V 96
+/repos/ss13_pp_inf_herbst/!svn/ver/15895/users/s226285/graphen/src/jpp/digraph/graph/XYNode.java
+END

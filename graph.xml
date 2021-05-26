@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="iso-8859-15"?>
+<gxl>
+    <graph id="id1">
+        <node id="id2">
+            <attr name="description">
+                <string>n1</string>
+            </attr>
+            <attr name="x">
+                <int>-2</int>
+            </attr>
+            <attr name="y">
+                <int>0</int>
+            </attr>
+        </node>
+        <node id="id3">
+            <attr name="description">
+                <string>n2</string>
+            </attr>
+            <attr name="x">
+                <int>0</int>
+            </attr>
+            <attr name="y">
+                <int>1</int>
+            </attr>
+        </node>
+        <node id="id4">
+            <attr name="description">
+                <string>n3</string>
+            </attr>
+            <attr name="x">
+                <int>1</int>
+            </attr>
+            <attr name="y">
+                <int>1</int>
+            </attr>
+         </node>
+<node id="id5">
+            <attr name="description">
+                <string>n4</string>
+            </attr>
+            <attr name="x">
+                <int>2</int>
+            </attr>
+            <attr name="y">
+                <int>2</int>
+            </attr>
+        </node>
+	<node id="id6">
+            <attr name="description">
+                <string>n5</string>
+            </attr>
+            <attr name="x">
+                <int>4</int>
+            </attr>
+            <attr name="y">
+                <int>-5</int>
+            </attr>
+        </node>
+        <edge from="id2" id="id7" to="id3">
+            <attr name="description">
+                <string>e1</string>
+            </attr>
+            <attr name="cost">
+                <float>1.2</float>
+            </attr>
+        </edge>
+        <edge from="id2" id="id8" to="id4">
+            <attr name="description">
+                <string>e3</string>
+            </attr>
+            <attr name="cost">
+                <float>2.1</float>
+            </attr>
+        </edge>
+        <edge from="id3" id="id9" to="id2">
+	    <attr name="description">
+                <string>e2</string>
+            </attr>
+            <attr name="cost">
+                <float>2.4</float>
+            </attr>
+        </edge>
+	        <edge from="id4" id="id10" to="id3">
+            <attr name="description">
+                <string>e4</string>
+            </attr>
+            <attr name="cost">
+                <float>2.1</float>
+            </attr>
+        </edge>
+	        <edge from="id4" id="id11" to="id5">
+	    <attr name="description">
+                <string>e5</string>
+            </attr>
+            <attr name="cost">
+                <float>2.4</float>
+            </attr>
+        </edge>
+        <edge from="id5" id="id12" to="id3">
+	    <attr name="description">
+                <string>e6</string>
+            </attr>
+            <attr name="cost">
+                <float>2.4</float>
+            </attr>
+        </edge>
+	        <edge from="id5" id="id13" to="id6">
+	    <attr name="description">
+                <string>e7</string>
+            </attr>
+            <attr name="cost">
+                <float>2.4</float>
+            </attr>
+        </edge>
+    </graph>
+</gxl>

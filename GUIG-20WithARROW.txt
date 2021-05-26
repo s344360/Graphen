@@ -1,0 +1,884 @@
+package jpp.digraph.gui;
+
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.scene.shape.StrokeLineCap;
+
+import java.io.File;
+
+import javafx.scene.text.Font;
+import javafx.scene.text.Text;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.TreeSet;
+
+import javafx.scene.text.TextBoundsType;
+import javafx.scene.transform.Scale;
+
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.xml.sax.SAXException;
+import javafx.scene.layout.StackPane;
+import javafx.scene.shape.Line;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
+import javafx.stage.FileChooser;
+import javafx.geometry.Insets;
+import javafx.scene.Group;
+import javafx.scene.Scene;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.stage.Stage;
+import jpp.digraph.exceptions.InvalidEdgeException;
+import jpp.digraph.exceptions.NodeNotExistsException;
+import jpp.digraph.graph.CostEdge;
+import jpp.digraph.graph.DiGraph;
+import jpp.digraph.graph.ICostEdge;
+import jpp.digraph.graph.IDiGraph;
+import jpp.digraph.graph.IEdge;
+import jpp.digraph.graph.INode;
+import jpp.digraph.graph.IXYNode;
+import jpp.digraph.graph.XYNode;
+import jpp.digraph.io.GXLSupport;
+import jpp.digraph.io.IGXLSupport;
+import jpp.digraph.io.XYGXLSupport;
+import jpp.digraph.search.BFS;
+import jpp.digraph.search.DFS;
+import jpp.digraph.search.Dijkstra;
+import jpp.digraph.search.IDiGraphSearchListener;
+import jpp.digraph.search.XYAStar;
+import javafx.scene.control.*;
+import javafx.scene.shape.Circle;
+import javafx.scene.paint.Color;
+import javafx.scene.control.*;
+import javafx.scene.layout.GridPane;
+import javafx.stage.Stage;
+import javafx.beans.*;
+import javafx.collections.*;
+import javafx.geometry.*;
+import javafx.scene.*;
+import javafx.stage.*;
+
+public class DiGraphGUI extends Application implements IDiGraphSearchListener<INode, IEdge<INode>> {
+	DiGraph graph = new DiGraph();
+	ArrayList<CostEdge> aefl = new ArrayList<CostEdge>();
+	ArrayList<XYNode> carr = new ArrayList<XYNode>();
+	LinkedList<CostEdge> edges = new LinkedList<CostEdge>();
+	String start;
+	String end;
+	String temp7 = "s";
+	Group group = new Group();
+	Thread d;
+	String time;
+	int timeI;
+	int height = 1200; //1200
+	int width = 1200;	//1200
+	int center = 600;	//600
+	double phi = Math.PI / 4;
+	double x;
+	double y;
+	double r;
+	double diffx = 0;
+	double diffy = 0;
+	double bigx;
+	double bigy;
+	int s;
+
+	@Override
+	public void start(Stage primaryStage) throws Exception {
+		XYGXLSupport xygxlsupport = new XYGXLSupport();
+		primaryStage.setTitle("JPPGraphen");
+		Button button = new Button("    Graph laden    ");
+		BorderPane borderPane = new BorderPane();
+		// Group group = new Group();
+		Group group1 = new Group();
+		borderPane.setCenter(group);
+
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Datei auswählen");
+		borderPane.setLeft(group1);
+		button.setTranslateX(10);
+		button.setTranslateY(15);
+
+		group1.getChildren().add(button);
+		Label label2 = new Label("Knoten wählen:");
+		Label label = new Label("Start:");
+		Label label9 = new Label("Ziel:");
+		Label label3 = new Label("Such-Algorithmus:");
+		label.setTranslateY(75);
+		label2.setTranslateX(40);
+		label2.setTranslateY(53);
+		label9.setTranslateY(105);
+		label3.setTranslateX(25);
+		label3.setTranslateY(150);
+		group1.getChildren().add(label2);
+		group1.getChildren().add(label);
+		group1.getChildren().add(label9);
+		group1.getChildren().add(label3);
+
+		ComboBox<String> myComboBox = new ComboBox<String>();
+		ComboBox<String> myComboBoxS = new ComboBox<String>();
+		myComboBox.getItems().addAll("       ");
+		myComboBox.setTranslateX(40);
+		myComboBox.setTranslateY(70);
+		myComboBoxS.setTranslateX(40);
+		myComboBoxS.setTranslateY(70);
+		group1.getChildren().add(myComboBox);
+
+		ComboBox<String> myComboBox1 = new ComboBox<String>();
+		ComboBox<String> myComboBox1S = new ComboBox<String>();
+		myComboBox1.getItems().addAll("       ");
+		myComboBox1.setTranslateX(40);
+		myComboBox1.setTranslateY(100);
+		myComboBox1S.setTranslateX(40);
+		myComboBox1S.setTranslateY(100);
+		group1.getChildren().add(myComboBox1);
+
+		ComboBox<String> myComboBox2 = new ComboBox<String>();
+		myComboBox2.getItems().addAll("A*-Suche", "Dijkstra", "BFS", "DFS");
+		myComboBox2.setTranslateX(30);
+		myComboBox2.setTranslateY(168);
+		group1.getChildren().add(myComboBox2);
+
+		Label label4 = new Label("Geschwindigkeit:");
+		label4.setTranslateX(30);
+		label4.setTranslateY(263);
+		group1.getChildren().add(label4);
+		ComboBox<String> myComboBox4 = new ComboBox<String>();
+		myComboBox4.getItems().addAll("     00     ", "200", "400", "600", "800", "1000", "1200", "1400", "1600",
+				"1800", "2000");
+		myComboBox4.setTranslateX(30);
+		myComboBox4.setTranslateY(280);
+		group1.getChildren().add(myComboBox4);
+
+		Button button2 = new Button(" Suche starten ");
+		button2.setTranslateX(27);
+		button2.setTranslateY(210);
+		group1.getChildren().add(button2);
+
+		/////////////////////////// GRAPH
+		/////////////////////////// LADEN//////////////////////////////////////////////////////
+		IDiGraphSearchListener<INode, IEdge<INode>> lis = this;
+		button.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent event) {
+
+				File file = fileChooser.showOpenDialog(primaryStage);
+				if (file == null) {
+					return;
+				}
+				try {
+					InputStream in = new FileInputStream(file);
+					graph = xygxlsupport.read(in);
+				} catch (InvalidEdgeException e) {
+					e.printStackTrace();
+				} catch (ParserConfigurationException e) {
+					e.printStackTrace();
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				} catch (SAXException e) {
+					e.printStackTrace();
+				}
+
+				ArrayList<XYNode> arr = new ArrayList<XYNode>(graph.getNodes());
+				edges = new LinkedList<CostEdge>(graph.getEdges());//
+				myComboBoxS.getItems().clear();
+				myComboBox.getItems().clear();
+				myComboBox1.getItems().clear();
+				myComboBox1S.getItems().clear();
+				double x;
+				double y;
+				double r = 10;
+
+				double bigx = arr.get(0).getX();
+				double bigy = arr.get(0).getY();
+				for (XYNode node : arr) {
+					if (node.getX() > bigx) {
+						bigx = node.getX();
+					}
+					if (node.getY() > bigy) {
+						bigy = node.getY();
+					}
+				}
+				if (bigx > center || bigy > center) {
+					s = 6;
+					if (bigx > center) {
+						diffx = bigx / center;
+					} else {
+						diffx = 0;
+					}
+					if (bigy > center) {
+						diffy = bigy / center;
+					} else {
+						diffy = 0;
+					}
+
+					for (XYNode node : arr) {
+						Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7, Color.DODGERBLUE);
+						Label label1 = new Label(node.getId() + "");
+						group.getChildren().addAll(circle);
+					}
+					for (CostEdge edge : edges) {
+						XYNode source = (XYNode) edge.getSource();
+						XYNode target = (XYNode) edge.getTarget();
+						Line line = new Line(source.getX() / diffx, source.getY() / diffy, target.getX() / diffx,
+								target.getY() / diffy);
+						Line arrow = solveArrow(source, target);
+						Line arrow2 = solveArrow2(source, target);
+						group.getChildren().addAll(line, arrow, arrow2);
+
+					}
+				} else {
+					s = 20;
+					for (XYNode node : arr) {
+						Circle circle = new Circle(node.getX(), node.getY(), 13, Color.DODGERBLUE);
+						Label label1 = new Label(node.getId() + "");
+						label1.setTranslateX(node.getX() - 9);
+						label1.setTranslateY(node.getY() - 8);
+						label1.setFont(Font.font(11));
+						label1.setTextFill(Color.BLACK.darker());
+
+						group.getChildren().addAll(circle, label1);// label1
+					}
+
+					for (CostEdge edge : edges) {
+						XYNode source = (XYNode) edge.getSource();
+						XYNode target = (XYNode) edge.getTarget();
+						Line line = new Line(source.getX(), source.getY(), target.getX(), target.getY());
+						Line arrow = solveArrow(source, target);
+						Line arrow2 = solveArrow2(source, target);
+						group.getChildren().addAll(line, arrow, arrow2);// ,
+
+					}
+				}
+				for (XYNode node : arr) {
+					myComboBoxS.getItems().addAll(node.getId());
+					myComboBox1S.getItems().addAll(node.getId());
+
+				}
+				for (XYNode node : arr) {
+					carr.add(node);
+				}
+				try {
+					group1.getChildren().add(myComboBoxS);
+					group1.getChildren().add(myComboBox1S);
+				} catch (IllegalArgumentException e) {
+
+				}
+			}
+		});
+
+		/////////////////////////// GRAPH
+		/////////////////////////// LADEN//////////////////////////////////////////////////////
+
+		myComboBoxS.setOnAction((event) -> {
+			start = myComboBoxS.getValue();
+
+		});
+
+		myComboBox1S.setOnAction((event) -> {
+			end = myComboBox1S.getValue();
+
+		});
+
+		myComboBox2.setOnAction((event) -> {
+			this.temp7 = myComboBox2.getValue();
+		});
+
+		myComboBox4.setOnAction((event) -> {
+			time = myComboBox4.getValue();
+
+		});
+		button2.setOnAction(new EventHandler<ActionEvent>() {
+
+			@Override
+			public void handle(ActionEvent arg0) {
+				ArrayList<XYNode> arr = new ArrayList<XYNode>(graph.getNodes());
+				edges = new LinkedList<CostEdge>(graph.getEdges());
+				try {
+					double bigx = arr.get(0).getX();
+					double bigy = arr.get(0).getY();
+					for (XYNode node : arr) {
+						if (node.getX() > bigx) {
+							bigx = node.getX();
+						}
+						if (node.getY() > bigy) {
+							bigy = node.getY();
+						}
+					}
+					if (bigx > center || bigy > center) {
+						s = 6;
+						if (bigx > center) {
+							diffx = bigx / center;
+						} else {
+							diffx = 0;
+						}
+						if (bigy > center) {
+							diffy = bigy / center;
+						} else {
+							diffy = 0;
+						}
+
+						for (XYNode node : arr) {
+							Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7, Color.DODGERBLUE);
+							Label label1 = new Label(node.getId() + "");
+							group.getChildren().addAll(circle);
+						}
+						for (CostEdge edge : edges) {
+							XYNode source = (XYNode) edge.getSource();
+							XYNode target = (XYNode) edge.getTarget();
+							Line line = new Line(source.getX() / diffx, source.getY() / diffy, target.getX() / diffx,
+									target.getY() / diffy);
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line, arrow, arrow2);
+
+						}
+					} else {
+						s = 20;
+						for (XYNode node : arr) {
+							Circle circle = new Circle(node.getX(), node.getY(), 13, Color.DODGERBLUE);
+							Label label1 = new Label(node.getId() + "");
+							label1.setTranslateX(node.getX() - 9);
+							label1.setTranslateY(node.getY() - 8);
+							label1.setFont(Font.font(11));
+							label1.setTextFill(Color.BLACK.darker());
+
+							group.getChildren().addAll(circle, label1);// label1
+						}
+
+						for (CostEdge edge : edges) {
+							XYNode source = (XYNode) edge.getSource();
+							XYNode target = (XYNode) edge.getTarget();
+							Line line = new Line(source.getX(), source.getY(), target.getX(), target.getY());
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line, arrow, arrow2);// ,
+
+						}
+					}
+					//////////////////////////////////////////////////////////////////
+					switch (temp7) {
+					case "A*-Suche": {
+						XYNode xynodestart = null;
+						XYNode xynodeend = null;
+						XYAStar star = new XYAStar();
+
+						for (XYNode node : carr) {
+							if (start == node.getId()) { // start.equals(node.getId())
+								xynodestart = node;
+							}
+							if (end == node.getId()) {// end.equals(node.getId())
+								xynodeend = node;
+							}
+						}
+						final XYNode xynodestart1 = xynodestart;
+						final XYNode xynodeend1 = xynodeend;
+						star.addListener(lis);
+						d = new Thread() {
+							public void run() {
+								try {
+									star.search(graph, xynodestart1, xynodeend1);
+								} catch (NodeNotExistsException e) {
+
+								}
+							}
+						};
+
+						d.start();
+						if (bigx > center || bigy > center) {
+							s = 6;
+							if (bigx > center) {
+								diffx = bigx / center;
+							} else {
+								diffx = 0;
+							}
+							if (bigy > center) {
+								diffy = bigy / center;
+							} else {
+								diffy = 0;
+							}
+
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+								}
+							}
+						} else {
+							s = 20;
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+									Label temp2 = new Label(node.getId() + "");
+									temp2.setTranslateX(node.getX() - 9);
+									temp2.setTranslateY(node.getY() - 8);
+									temp2.setFont(Font.font(11));
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									group.getChildren().addAll(circle, temp2);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									Label temp1 = new Label(node.getId() + "");
+									temp1.setTranslateX(node.getX() - 9);
+									temp1.setTranslateY(node.getY() - 8);
+									temp1.setFont(Font.font(11));
+									group.getChildren().addAll(circle, temp1);
+								}
+							}
+
+						}
+
+						break;
+
+					}
+					case "Dijkstra": {
+						XYNode xynodestart = null;
+						XYNode xynodeend = null;
+						Dijkstra dijkstra = new Dijkstra();
+						for (XYNode node : carr) {
+							if (start == node.getId()) {// start.equals(node.getId())
+								xynodestart = node;
+							}
+							if (end == node.getId()) {// end.equals(node.getId())
+								xynodeend = node;
+							}
+						}
+						final XYNode xynodestart1 = xynodestart;
+						final XYNode xynodeend1 = xynodeend;
+						dijkstra.addListener(lis);
+						d = new Thread() {
+							public void run() {
+								try {
+									dijkstra.search(graph, xynodestart1, xynodeend1);
+								} catch (NodeNotExistsException e) {
+
+								}
+							}
+						};
+
+						d.start();
+						if (bigx > center || bigy > center) {
+							s = 6;
+							if (bigx > center) {
+								diffx = bigx / center;
+							} else {
+								diffx = 0;
+							}
+							if (bigy > center) {
+								diffy = bigy / center;
+							} else {
+								diffy = 0;
+							}
+
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+								}
+							}
+						} else {
+							s = 20;
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+									Label temp2 = new Label(node.getId() + "");
+									temp2.setTranslateX(node.getX() - 9);
+									temp2.setTranslateY(node.getY() - 8);
+									temp2.setFont(Font.font(11));
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									group.getChildren().addAll(circle, temp2);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									Label temp1 = new Label(node.getId() + "");
+									temp1.setTranslateX(node.getX() - 9);
+									temp1.setTranslateY(node.getY() - 8);
+									temp1.setFont(Font.font(11));
+									group.getChildren().addAll(circle, temp1);
+								}
+							}
+
+						}
+
+						break;
+					}
+					case "BFS": {
+						XYNode xynodestart = null;
+						XYNode xynodeend = null;
+						BFS bfs = new BFS();
+						for (XYNode node : carr) {
+							if (start == node.getId()) {// start.equals(node.getId())
+								xynodestart = node;
+							}
+							if (end == node.getId()) {// end.equals(node.getId())
+								xynodeend = node;
+							}
+						}
+						bfs.addListener(lis);
+						final XYNode xynodestart1 = xynodestart;
+						final XYNode xynodeend1 = xynodeend;
+
+						d = new Thread() {
+							public void run() {
+								try {
+									bfs.search(graph, xynodestart1, xynodeend1);
+								} catch (NodeNotExistsException e) {
+
+								}
+							}
+						};
+
+						d.start();
+						if (bigx > center || bigy > center) {
+							s = 6;
+							if (bigx > center) {
+								diffx = bigx / center;
+							} else {
+								diffx = 0;
+							}
+							if (bigy > center) {
+								diffy = bigy / center;
+							} else {
+								diffy = 0;
+							}
+
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+								}
+							}
+						} else {
+							s = 20;
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+									Label temp2 = new Label(node.getId() + "");
+									temp2.setTranslateX(node.getX() - 9);
+									temp2.setTranslateY(node.getY() - 8);
+									temp2.setFont(Font.font(11));
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									group.getChildren().addAll(circle, temp2);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									Label temp1 = new Label(node.getId() + "");
+									temp1.setTranslateX(node.getX() - 9);
+									temp1.setTranslateY(node.getY() - 8);
+									temp1.setFont(Font.font(11));
+									group.getChildren().addAll(circle, temp1);
+								}
+							}
+
+						}
+
+						break;
+					}
+					case "DFS": {
+						XYNode xynodestart = null;
+						XYNode xynodeend = null;
+						DFS dfs = new DFS();
+						for (XYNode node : carr) {
+							if (start == node.getId()) {// start.equals(node.getId())
+								xynodestart = node;
+							}
+							if (end == node.getId()) {// end.equals(node.getId())
+								xynodeend = node;
+							}
+						}
+
+						dfs.addListener(lis);
+						final XYNode xynodestart1 = xynodestart;
+						final XYNode xynodeend1 = xynodeend;
+
+						d = new Thread() {
+							public void run() {
+								try {
+									dfs.search(graph, xynodestart1, xynodeend1);
+								} catch (NodeNotExistsException e) {
+
+								}
+							}
+						};
+
+						d.start();
+
+						if (bigx > center || bigy > center) {
+							s = 6;
+							if (bigx > center) {
+								diffx = bigx / center;
+							} else {
+								diffx = 0;
+							}
+							if (bigy > center) {
+								diffy = bigy / center;
+							} else {
+								diffy = 0;
+							}
+
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX() / diffx, node.getY() / diffy, 7,
+											Color.YELLOW);
+									group.getChildren().addAll(circle);
+								}
+							}
+						} else {
+							s = 20;
+							for (XYNode node : carr) {
+								if (start.equals(node.getId())) {
+									Label temp2 = new Label(node.getId() + "");
+									temp2.setTranslateX(node.getX() - 9);
+									temp2.setTranslateY(node.getY() - 8);
+									temp2.setFont(Font.font(11));
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									group.getChildren().addAll(circle, temp2);
+
+								}
+
+							}
+							for (XYNode node : carr) {
+								if (end.equals(node.getId())) {
+									Circle circle = new Circle(node.getX(), node.getY(), 13, Color.YELLOW);
+									Label temp1 = new Label(node.getId() + "");
+									temp1.setTranslateX(node.getX() - 9);
+									temp1.setTranslateY(node.getY() - 8);
+									temp1.setFont(Font.font(11));
+									group.getChildren().addAll(circle, temp1);
+								}
+							}
+
+						}
+
+						break;
+					}
+					}
+
+				} catch (NullPointerException e) {
+
+				}
+			}
+		});
+		Scene scene = new Scene(borderPane, width, height); // 800,600
+		primaryStage.setScene(scene);
+		primaryStage.show();
+
+	}
+
+	@Override
+	public void onExpandNode(INode node, List<IEdge<INode>> way) {
+		XYNode xynodestart = null;
+		XYNode xynodeend = null;
+		for (XYNode node1 : carr) {
+			if (end == node1.getId()) {
+				xynodeend = node1;
+			}
+		}
+		final XYNode xynodeend1 = xynodeend;
+		ArrayList<XYNode> arr = new ArrayList<XYNode>(graph.getNodes());
+		double bigx = arr.get(0).getX();
+		double bigy = arr.get(0).getY();
+		for (XYNode node1 : arr) {
+			if (node1.getX() > bigx) {
+				bigx = node1.getX();
+			}
+			if (node1.getY() > bigy) {
+				bigy = node1.getY();
+			}
+		}
+
+		final double bigx1 = bigx;
+		final double bigy1 = bigy;
+		try {
+			timeI = Integer.parseInt(time);
+		} catch (NumberFormatException e) {
+
+		}
+
+		try {
+			Thread.sleep(timeI);
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+
+		Platform.runLater(new Runnable() {
+			@Override
+			public void run() {
+				if (bigx1 > center || bigy1 > center) {
+					if (((Object) node).equals(xynodeend1)) {
+						for (IEdge way2 : way) {
+							XYNode source = (XYNode) way2.getSource();
+							XYNode target = (XYNode) way2.getTarget();
+							double tarx = target.getX() / diffx;
+							double tary = target.getY() / diffy;
+							double soux = source.getX() / diffx;
+							double souy = source.getY() / diffy;
+							Line line3 = new Line(soux, souy, tarx, tary);
+							line3.setStroke(Color.LAWNGREEN);//LAWNGREEN
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line3, arrow, arrow2);
+						}
+
+					} else {
+						for (IEdge way2 : way) {
+							XYNode source = (XYNode) way2.getSource();
+							XYNode target = (XYNode) way2.getTarget();
+							double tarx = target.getX() / diffx;
+							double tary = target.getY() / diffy;
+							double soux = source.getX() / diffx;
+							double souy = source.getY() / diffy;
+							Line line3 = new Line(soux, souy, tarx, tary);
+							line3.setStroke(Color.AQUA);
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line3, arrow, arrow2);
+						}
+					}
+				} else {
+					if (((Object) node).equals(xynodeend1)) {
+						for (IEdge way2 : way) {
+							XYNode source = (XYNode) way2.getSource();
+							XYNode target = (XYNode) way2.getTarget();
+							Line line3 = new Line(source.getX(), source.getY(), target.getX(), target.getY());
+							line3.setStroke(Color.LAWNGREEN);
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line3, arrow, arrow2);
+						}
+
+					} else {
+						for (IEdge way2 : way) {
+							XYNode source = (XYNode) way2.getSource();
+							XYNode target = (XYNode) way2.getTarget();
+							Line line3 = new Line(source.getX(), source.getY(), target.getX(), target.getY());
+							line3.setStroke(Color.AQUA);
+							Line arrow = solveArrow(source, target);
+							Line arrow2 = solveArrow2(source, target);
+							group.getChildren().addAll(line3, arrow, arrow2);
+						}
+					}
+				}
+			}
+
+		});
+
+	}
+
+	public static void main(String[] args) {
+		launch(args);
+
+	}
+
+	public Line solveArrow(XYNode source, XYNode target) {
+		double tarx = 0;
+		double tary = 0;
+		double soux = 0;
+		double souy = 0;
+		if (s == 6) {
+			tarx = target.getX() / diffx;
+			tary = target.getY() / diffy;
+			soux = source.getX() / diffx;
+			souy = source.getY() / diffy;
+
+		} else {
+			tarx = target.getX();
+			tary = target.getY();
+			soux = source.getX();
+			souy = source.getY();
+		}
+		Line arrow = new Line(tarx, tary,
+				(tarx - Math.sin(phi - Math.atan2(((tary) - (source.getY())), ((tarx) - (soux)))) * s),
+				(tary - Math.cos(phi - Math.atan2(((tary) - (source.getY())), ((tarx) - (soux)))) * s));
+		arrow.setStroke(Color.RED);
+		return arrow;
+	}
+
+	public Line solveArrow2(XYNode source, XYNode target) {
+		double tarx = 0;
+		double tary = 0;
+		double soux = 0;
+		double souy = 0;
+		if (s == 6) {
+			tarx = target.getX() / diffx;
+			tary = target.getY() / diffy;
+			soux = source.getX() / diffx;
+			souy = source.getY() / diffy;
+
+		} else {
+			tarx = target.getX();
+			tary = target.getY();
+			soux = source.getX();
+			souy = source.getY();
+
+		}
+		Line arrow2 = new Line(tarx, tary,
+				(tarx - Math.cos(phi - Math.atan2(((tary) - (souy)), ((tarx) - (soux)))) * s),
+				(tary + Math.sin(phi - Math.atan2(((tary) - (souy)), ((tarx) - (soux)))) * s));
+		arrow2.setStroke(Color.RED);
+		return arrow2;
+	}
+
+}

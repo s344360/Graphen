@@ -1,0 +1,17 @@
+K 10
+svn:ignore
+V 76
+build
+target
+.settings
+.classpath
+.project
+bin
+.idea
+out
+*.iml
+*.ipr
+*.iwr
+
+
+END
